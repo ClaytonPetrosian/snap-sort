@@ -17,6 +17,7 @@ export function SettingsScreen({ navigation }: any) {
   const [apiKey, setApiKey] = useState('');
   const [lowPowerMode, setLowPowerMode] = useState(true);
   const [kValue, setKValue] = useState('5');
+  const [cloudAIEnabled, setCloudAIEnabled] = useState(false);
 
   const handleSaveApiKey = () => {
     if (!apiKey.trim()) {
@@ -24,7 +25,8 @@ export function SettingsScreen({ navigation }: any) {
       return;
     }
     // TODO: SecureStore save
-    Alert.alert('成功', 'API Key 已保存');
+    setCloudAIEnabled(true);
+    Alert.alert('成功', 'API Key 已保存，云端 AI 已启用');
   };
 
   return (
@@ -60,8 +62,23 @@ export function SettingsScreen({ navigation }: any) {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>云端 AI 扩展</Text>
         <Text style={styles.description}>
-          输入 Gemini API Key 以启用云端图片识别功能（可选）
+          输入 Gemini API Key 以启用云端图片识别功能（可选，离线优先）
         </Text>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>启用云端 AI</Text>
+          <Switch
+            value={cloudAIEnabled}
+            onValueChange={(v) => {
+              if (v && !apiKey.trim()) {
+                Alert.alert('提示', '请先输入 Gemini API Key');
+                return;
+              }
+              setCloudAIEnabled(v);
+            }}
+            trackColor={{ false: '#333', true: '#10b981' }}
+          />
+        </View>
 
         <TextInput
           style={styles.apiInput}

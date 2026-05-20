@@ -6,7 +6,7 @@ import type { Embedding } from '@smart-photo/core';
 import type { IEmbeddingAdapter, DeviceState, ThrottlePolicy } from './types.js';
 
 export abstract class BaseEmbeddingAdapter implements IEmbeddingAdapter {
-  private disposed = false;
+  protected disposed = false;
   private pausePromise: Promise<void> | null = null;
   private pauseResolve: (() => void) | null = null;
 
@@ -67,7 +67,7 @@ export abstract class BaseEmbeddingAdapter implements IEmbeddingAdapter {
     return false;
   }
 
-  private async checkThrottle(): Promise<void> {
+  protected async checkThrottle(): Promise<void> {
     if (this.pausePromise) {
       await this.pausePromise;
     }
