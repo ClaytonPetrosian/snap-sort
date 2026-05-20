@@ -1,0 +1,36 @@
+{
+  "name": "@smart-photo/ai-engine",
+  "version": "0.1.0",
+  "description": "AI engine with platform adapters for CLIP embedding extraction",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./adapters/*": {
+      "types": "./dist/adapters/*.d.ts",
+      "import": "./dist/adapters/*.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "files": ["dist"],
+  "license": "MIT",
+  "dependencies": {
+    "@smart-photo/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "onnxruntime-react-native": "^1.20.0"
+  },
+  "peerDependenciesMeta": {
+    "onnxruntime-react-native": {
+      "optional": true
+    }
+  }
+}

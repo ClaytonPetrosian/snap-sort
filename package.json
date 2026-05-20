@@ -1,0 +1,17 @@
+{
+  "name": "smart-photo",
+  "private": true,
+  "description": "AI-powered smart photo album classification - local-first, cross-platform",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "lint": "pnpm -r run lint",
+    "typecheck": "pnpm -r run typecheck"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "vitest": "^3.1.0",
+    "@types/node": "^22.0.0"
+  },
+  "packageManager": "pnpm@10.11.0"
+}
