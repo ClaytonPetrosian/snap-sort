@@ -3,12 +3,15 @@
   "private": true,
   "description": "AI-powered smart photo album classification - local-first, cross-platform",
   "scripts": {
-    "build": "pnpm --filter './packages/core' --filter './packages/ai-engine' run build",
-    "test": "pnpm --filter './packages/*' run test",
-    "typecheck": "pnpm --filter './packages/*' run typecheck",
+    "build": "pnpm --filter @smart-photo/core --filter @smart-photo/ai-engine run build",
+    "test": "pnpm --filter @smart-photo/core --filter @smart-photo/ai-engine run test",
+    "typecheck": "pnpm --filter @smart-photo/* run typecheck",
     "app:start": "pnpm --filter @smart-photo/app run start",
     "app:android": "pnpm --filter @smart-photo/app run android",
-    "app:ios": "pnpm --filter @smart-photo/app run ios"
+    "app:ios": "pnpm --filter @smart-photo/app run ios",
+    "desktop:dev": "pnpm --filter @smart-photo/desktop run tauri:dev",
+    "desktop:build": "pnpm --filter @smart-photo/desktop run tauri:build",
+    "download-model": "pnpm --filter @smart-photo/ai-engine run download-model"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

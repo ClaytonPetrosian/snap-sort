@@ -27,3 +27,9 @@ export type { ReactNativeAdapterConfig } from './adapters/react-native.js';
 export { TauriAdapter } from './adapters/tauri.js';
 export { GeminiAdapter } from './adapters/gemini.js';
 export type { GeminiAdapterConfig } from './adapters/gemini.js';
+
+// Model management
+export { ModelManager } from './model/index.js';
+export type { ModelManagerConfig, DownloadProgress } from './model/index.js';
+export { MODEL_REGISTRY, getModel, listModels } from './model/index.js';
+export type { ModelEntry } from './model/index.js';

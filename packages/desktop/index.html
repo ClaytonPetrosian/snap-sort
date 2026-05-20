@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SnapSort — AI Photo Cleanup</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Header -->
+      <header class="header">
+        <div class="logo">
+          <span class="logo-icon">📷</span>
+          <h1>SnapSort</h1>
+        </div>
+        <nav class="nav">
+          <button class="nav-btn active" data-view="home">首页</button>
+          <button class="nav-btn" data-view="classify">分类</button>
+          <button class="nav-btn" data-view="cleanup">清理</button>
+          <button class="nav-btn" data-view="settings">设置</button>
+        </nav>
+      </header>
+
+      <!-- Main content -->
+      <main class="main">
+        <!-- Home View -->
+        <section id="view-home" class="view active">
+          <div class="hero">
+            <h2>AI 智能相册清理</h2>
+            <p>选择一个文件夹开始扫描和分类照片</p>
+          </div>
+
+          <div class="scan-section">
+            <div class="folder-picker">
+              <button id="btn-pick-folder" class="btn btn-primary btn-lg">
+                📁 选择照片文件夹
+              </button>
+              <p class="hint">支持 JPG, PNG, WebP, HEIC, BMP, GIF</p>
+            </div>
+
+            <div id="scan-progress" class="scan-progress hidden">
+              <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+              </div>
+              <div class="progress-info">
+                <span id="scan-status">扫描中...</span>
+                <span id="scan-count">0 / 0</span>
+              </div>
+              <div class="progress-stats">
+                <div class="stat">
+                  <span id="stat-new" class="stat-num">0</span>
+                  <span class="stat-label">新增</span>
+                </div>
+                <div class="stat">
+                  <span id="stat-embedded" class="stat-num">0</span>
+                  <span class="stat-label">已提取 Embedding</span>
+                </div>
+                <div class="stat">
+                  <span id="stat-errors" class="stat-num">0</span>
+                  <span class="stat-label">错误</span>
+                </div>
+              </div>
+              <button id="btn-cancel-scan" class="btn btn-secondary">取消扫描</button>
+            </div>
+
+            <div id="scan-complete" class="scan-complete hidden">
+              <div class="complete-icon">✅</div>
+              <h3>扫描完成</h3>
+              <p id="complete-summary"></p>
+              <button id="btn-start-classify" class="btn btn-primary">开始分类</button>
+            </div>
+          </div>
+
+          <!-- Recent scans -->
+          <div id="recent-scans" class="recent-scans">
+            <h3>最近扫描</h3>
+            <div id="recent-list" class="recent-list"></div>
+          </div>
+        </section>
+
+        <!-- Classify View -->
+        <section id="view-classify" class="view">
+          <div class="classify-header">
+            <h2>照片分类</h2>
+            <div class="classify-stats">
+              <span id="classify-total">0 张待分类</span>
+              <span id="classify-done">已分类: 0</span>
+            </div>
+          </div>
+
+          <div class="card-deck">
+            <div id="current-card" class="card">
+              <div class="card-image-wrapper">
+                <img id="card-image" src="" alt="Photo" />
+              </div>
+              <div class="card-info">
+                <span id="card-prediction" class="prediction-badge hidden"></span>
+                <span id="card-confidence"></span>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <button id="btn-keep" class="btn btn-keep" title="保留">
+                ❤️ 保留
+              </button>
+              <button id="btn-undo" class="btn btn-undo" title="撤销">
+                ↩️ 撤销
+              </button>
+              <button id="btn-trash" class="btn btn-trash" title="删除">
+                🗑️ 删除
+              </button>
+            </div>
+
+            <div class="card-hints">
+              <span>← 保留</span>
+              <span>↑ 撤销</span>
+              <span>删除 →</span>
+            </div>
+          </div>
+
+          <div id="classify-empty" class="classify-empty hidden">
+            <h3>所有照片已分类！</h3>
+            <p>你可以前往"清理"页面确认删除</p>
+            <button id="btn-go-cleanup" class="btn btn-primary">前往清理</button>
+          </div>
+        </section>
+
+        <!-- Cleanup View -->
+        <section id="view-cleanup" class="view">
+          <h2>确认清理</h2>
+          <p class="cleanup-desc">以下照片被标记为"删除"，请确认后再执行。</p>
+
+          <div class="cleanup-stats">
+            <div class="cleanup-stat">
+              <span id="cleanup-trash-count" class="stat-num">0</span>
+              <span class="stat-label">待删除</span>
+            </div>
+            <div class="cleanup-stat">
+              <span id="cleanup-keep-count" class="stat-num">0</span>
+              <span class="stat-label">保留</span>
+            </div>
+          </div>
+
+          <div id="cleanup-list" class="cleanup-list"></div>
+
+          <div class="cleanup-actions">
+            <button id="btn-confirm-delete" class="btn btn-danger btn-lg">
+              🗑️ 确认删除选中照片
+            </button>
+            <button id="btn-cancel-cleanup" class="btn btn-secondary">
+              取消
+            </button>
+          </div>
+        </section>
+
+        <!-- Settings View -->
+        <section id="view-settings" class="view">
+          <h2>设置</h2>
+
+          <div class="settings-group">
+            <h3>CLIP 模型</h3>
+            <div class="setting-row">
+              <label>模型状态</label>
+              <span id="model-status" class="status-badge">未加载</span>
+            </div>
+            <div class="setting-row">
+              <label>模型路径</label>
+              <input type="text" id="model-path" placeholder="选择 ONNX 模型文件..." />
+              <button id="btn-browse-model" class="btn btn-secondary btn-sm">浏览</button>
+            </div>
+            <div class="setting-row">
+              <button id="btn-load-model" class="btn btn-primary">加载模型</button>
+              <button id="btn-download-model" class="btn btn-secondary">下载默认模型</button>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3>扫描设置</h3>
+            <div class="setting-row">
+              <label>批量大小</label>
+              <input type="number" id="batch-size" value="10" min="1" max="100" />
+            </div>
+            <div class="setting-row">
+              <label>KNN K 值</label>
+              <input type="number" id="knn-k" value="5" min="1" max="20" />
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3>关于</h3>
+            <p>SnapSort v0.1.0 — AI-powered photo cleanup</p>
+            <p>本地优先 · 隐私保护 · CLIP + KNN + Active Learning</p>
+          </div>
+        </section>
+      </main>
+
+      <!-- Status bar -->
+      <footer class="status-bar">
+        <span id="status-text">就绪</span>
+        <span id="status-model">模型: 未加载</span>
+      </footer>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

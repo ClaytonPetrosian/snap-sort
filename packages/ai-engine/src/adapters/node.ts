@@ -7,8 +7,9 @@
  *   npm install onnxruntime-node sharp
  *
  * Model setup:
- *   Place the ONNX model at: ./models/clip-vit-base-patch32.onnx
- *   Or specify a custom path via EmbeddingConfig.modelPath
+ *   Option 1: Place the ONNX model at: ./models/clip-vit-base-patch32.onnx
+ *   Option 2: Use ModelManager to auto-download from Hugging Face
+ *   Option 3: Specify a custom path via NodeAdapterConfig.modelPath
  *
  * The expected ONNX model has:
  *   Input:  "pixel_values" — Float32[1, 3, 224, 224]
@@ -18,6 +19,9 @@ import type { Embedding } from '@smart-photo/core';
 import { BaseEmbeddingAdapter } from '../base-adapter.js';
 import type { EmbeddingConfig } from '../types.js';
 import { normalizeToCHW } from '../preprocess.js';
+import { ModelManager } from '../model/manager.js';
+import { getModel } from '../model/registry.js';
+import type { DownloadProgress } from '../model/manager.js';
 
 const DEFAULT_CONFIG: Required<EmbeddingConfig> = {
   model: 'clip-vit-base-patch32',
@@ -32,7 +36,7 @@ const DEFAULT_CONFIG: Required<EmbeddingConfig> = {
 let _ort: any = null;
 let _sharp: any = null;
 
-// Use dynamic import via eval to avoid TypeScript module resolution errors
+// Use dynamic import to avoid TypeScript module resolution errors
 // when optional dependencies are not installed.
 const dynamicImport = (id: string) => import(/* @vite-ignore */ id);
 
@@ -66,15 +70,28 @@ async function loadSharp(): Promise<any> {
 }
 
 export interface NodeAdapterConfig extends EmbeddingConfig {
-  /** Path to ONNX model file (default: auto-detect based on model name) */
+  /** Path to ONNX model file. If not set, uses ModelManager to resolve. */
   modelPath?: string;
   /** Execution providers in priority order (default: ['cpu']) */
   executionProviders?: string[];
+  /** Auto-download model if not cached (default: true) */
+  autoDownload?: boolean;
+  /** Custom model cache directory */
+  modelCacheDir?: string;
+  /** Called during model download with progress info */
+  onDownloadProgress?: (progress: DownloadProgress) => void;
 }
 
 export class NodeAdapter extends BaseEmbeddingAdapter {
-  private config: Required<EmbeddingConfig> & { modelPath?: string; executionProviders: string[] };
+  private config: Required<EmbeddingConfig> & {
+    modelPath?: string;
+    executionProviders: string[];
+    autoDownload: boolean;
+    modelCacheDir?: string;
+  };
+  private onDownloadProgress?: (progress: DownloadProgress) => void;
   private session: any = null;
+  private modelManager: ModelManager;
 
   constructor(config: NodeAdapterConfig = {}) {
     super();
@@ -82,14 +99,29 @@ export class NodeAdapter extends BaseEmbeddingAdapter {
       ...DEFAULT_CONFIG,
       ...config,
       executionProviders: config.executionProviders ?? ['cpu'],
+      autoDownload: config.autoDownload ?? true,
     };
+    this.onDownloadProgress = config.onDownloadProgress;
+    this.modelManager = new ModelManager({
+      cacheDir: config.modelCacheDir,
+      autoDownload: config.autoDownload ?? true,
+    });
   }
 
   async init(): Promise<void> {
     const ort = await loadOrt();
 
-    const modelPath = this.config.modelPath
-      ?? `./models/${this.config.model}.onnx`;
+    // Resolve model path: explicit path > ModelManager cache
+    let modelPath: string;
+    if (this.config.modelPath) {
+      modelPath = this.config.modelPath;
+    } else {
+      // Use ModelManager to resolve (download if needed)
+      modelPath = await this.modelManager.resolve(
+        this.config.model,
+        this.onDownloadProgress,
+      );
+    }
 
     try {
       this.session = await ort.InferenceSession.create(modelPath, {
@@ -98,11 +130,14 @@ export class NodeAdapter extends BaseEmbeddingAdapter {
     } catch (err) {
       throw new Error(
         `Failed to load CLIP model from ${modelPath}: ${err instanceof Error ? err.message : err}\n` +
-        'Make sure the ONNX model file exists. See README for download instructions.',
+        'Make sure the ONNX model file exists and is valid.',
       );
     }
 
-    console.log(`[Node Adapter] CLIP model loaded: ${modelPath}`);
+    const modelEntry = getModel(this.config.model);
+    console.log(
+      `[Node Adapter] CLIP model loaded: ${modelEntry.name} from ${modelPath}`,
+    );
   }
 
   async getEmbedding(fileUri: string): Promise<Embedding> {
