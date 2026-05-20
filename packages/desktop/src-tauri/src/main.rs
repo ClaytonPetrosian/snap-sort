@@ -168,7 +168,7 @@ async fn scan_directory(dir_path: String) -> Result<ScanResult, String> {
 /// Check if the ONNX runtime is available.
 #[tauri::command]
 fn check_ort_available() -> Result<String, String> {
-    Ok(format!("ort version: {}", env!("CARGO_PKG_VERSION")))
+    Ok(format!("snap-sort-desktop v{}", env!("CARGO_PKG_VERSION")))
 }
 
 /// Get model status.
@@ -253,10 +253,6 @@ fn preprocess_image(file_path: &str) -> Result<Vec<f32>, String> {
         }
     }
 
-    // Prepend batch dimension: [1, 3, 224, 224]
-    let mut batched = vec![0.0f32; 1 + chw.len()];
-    batched[0] = 1.0; // batch size = 1 (won't matter for tensor shape)
-    // Actually, let's just return CHW and let the tensor builder handle shape
     Ok(chw)
 }
 
