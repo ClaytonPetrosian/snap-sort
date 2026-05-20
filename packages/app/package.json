@@ -1,0 +1,31 @@
+{
+  "name": "@smart-photo/app",
+  "version": "0.1.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@smart-photo/core": "workspace:*",
+    "@smart-photo/ai-engine": "workspace:*",
+    "expo": "~53.0.0",
+    "expo-media-library": "~17.1.0",
+    "expo-router": "~5.0.0",
+    "expo-file-system": "~18.1.0",
+    "react": "19.0.0",
+    "react-native": "0.79.0",
+    "react-native-gesture-handler": "~2.24.0",
+    "react-native-reanimated": "~3.17.0",
+    "react-native-safe-area-context": "~5.4.0",
+    "react-native-screens": "~4.11.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.0.0",
+    "typescript": "~5.7.0"
+  }
+}

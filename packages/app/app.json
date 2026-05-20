@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "SnapSort",
+    "slug": "snap-sort",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.smartsnap.app",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "SnapSort needs access to your photo library to help you organize and clean up your photos.",
+        "NSPhotoLibraryAddUsageDescription": "SnapSort needs permission to save organized photos."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#000000"
+      },
+      "package": "com.smartsnap.app",
+      "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "READ_MEDIA_IMAGES"]
+    },
+    "plugins": [
+      "expo-media-library",
+      "expo-router"
+    ]
+  }
+}
