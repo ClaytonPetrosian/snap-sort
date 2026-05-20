@@ -1,6 +1,38 @@
-node_modules
-dist
-.turbo
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
 *.tsbuildinfo
+.turbo/
+
+# Rust / Tauri
+packages/desktop/src-tauri/target/
+
+# ONNX models (large binary files, downloaded on demand)
+*.onnx
+models/
+
+# Environment
 .env
 .env.*
+.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Coverage
+coverage/
