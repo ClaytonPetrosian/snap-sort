@@ -33,3 +33,6 @@ export type { KNNClassifierOptions } from './classifier.js';
 
 // Active Learning
 export { UncertaintySampler, selectBatch } from './active-learning.js';
+
+// Feature Store
+export { InMemoryFeatureStore } from './feature-store.js';
