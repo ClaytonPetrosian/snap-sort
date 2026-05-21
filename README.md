@@ -1,5 +1,7 @@
 # SnapSort
 
+English | [中文](./README.zh-CN.md)
+
 AI-powered photo cleanup tool — local-first, cross-platform, privacy-respecting.
 
 SnapSort uses CLIP embeddings + KNN classification with active learning to help you quickly sort through thousands of photos. It runs entirely on your device (no cloud required), processes images in batches, and learns your preferences as you swipe.
